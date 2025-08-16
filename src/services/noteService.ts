@@ -1,13 +1,29 @@
-import axios from 'axios';
-import type { Note, NoteTag } from '../types/note';
+import axios from "axios";
+import type { AxiosResponse } from "axios";
+import type { Note, NoteTag } from "../types/note";
 
-const API_BASE_URL = 'https://notehub-public.goit.study/api';
+const BASE_URL = "https://notehub-public.goit.study/api/notes";
+const token = import.meta.env.VITE_NOTEHUB_TOKEN;
+
+const api = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
+
+
+export interface FetchNotesParams {
+  page?: number;
+  perPage?: number;
+  search?: string;
+}
 
 export interface FetchNotesResponse {
-  data: Note[];
-  total: number;
   page: number;
   perPage: number;
+  totalPages: number;
+  notes: Note[];
 }
 
 export interface CreateNoteParams {
@@ -17,33 +33,22 @@ export interface CreateNoteParams {
 }
 
 export const fetchNotes = async (
-  page: number = 1,
-  perPage: number = 12,
-  search: string = ''
+  params: FetchNotesParams
 ): Promise<FetchNotesResponse> => {
-  const response = await axios.get(`${API_BASE_URL}/notes`, {
-    params: { page, perPage, search },
-    headers: {
-      Authorization: `Bearer ${import.meta.env.VITE_NOTEHUB_TOKEN}`,
-    },
+  const { data }: AxiosResponse<FetchNotesResponse> = await api.get("", {
+    params,
   });
-  return response.data;
+  return data;
 };
 
-export const createNote = async (noteData: CreateNoteParams): Promise<Note> => {
-  const response = await axios.post(`${API_BASE_URL}/notes`, noteData, {
-    headers: {
-      Authorization: `Bearer ${import.meta.env.VITE_NOTEHUB_TOKEN}`,
-    },
-  });
-  return response.data;
+export const createNote = async (
+  noteData: CreateNoteParams
+): Promise<Note> => {
+  const { data }: AxiosResponse<Note> = await api.post("", noteData);
+  return data;
 };
 
 export const deleteNote = async (id: string): Promise<Note> => {
-  const response = await axios.delete(`${API_BASE_URL}/notes/${id}`, {
-    headers: {
-      Authorization: `Bearer ${import.meta.env.VITE_NOTEHUB_TOKEN}`,
-    },
-  });
-  return response.data;
+  const { data }: AxiosResponse<Note> = await api.delete(`/${id}`);
+  return data;
 };
