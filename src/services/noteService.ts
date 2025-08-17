@@ -52,3 +52,11 @@ export const deleteNote = async (id: string): Promise<Note> => {
   const { data }: AxiosResponse<Note> = await api.delete(`/${id}`);
   return data;
 };
+
+export const updateNote = async (
+  id: string,
+  noteData: Partial<CreateNoteParams>
+): Promise<Note> => {
+  const { data }: AxiosResponse<Note> = await api.patch(`/${id}`, noteData);
+  return data;
+};
